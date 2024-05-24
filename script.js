@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyAcApNqe43fz4XAlmzBYnY0Nc_OOUgoBm0",
+        authDomain: "ehtid-b19af.firebaseapp.com",
+        projectId: "ehtid-b19af",
+        storageBucket: "ehtid-b19af.appspot.com",
+        messagingSenderId: "803299970129",
+        appId: "1:803299970129:web:b7f9bd1600d1598215bc70"
     };
     
     // Initialize Firebase
