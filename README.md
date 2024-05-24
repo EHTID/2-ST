@@ -1,2 +1,2 @@
-# 2-ST.github.io
+# 2-ST
 My first project on GitHub
