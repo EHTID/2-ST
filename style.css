@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: black;
+    color: white;
+}
+
+h1, h2 {
+    color: #FFD700; /* Золотой цвет */
+}
+
+button {
+    background-color: #FF6347; /* Красный цвет */
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #FF4500; /* Темно-оранжевый цвет */
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+th {
+    background-color: #4CAF50; /* Зеленый цвет */
+    color: white;
+}
