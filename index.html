@@ -3,21 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload</title>
+    <title>Python Quiz</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>File Upload</h1>
-        <div id="storageInfo"></div>
-        <input type="file" id="fileInput" multiple>
-        <button id="uploadBtn">Upload</button>
-        <ul id="fileList"></ul>
-        <div id="progressContainer">
-            <progress id="uploadProgress" value="0" max="100"></progress>
-            <span id="progressPercentage">0%</span>
+    <div class="quiz-container" id="quiz">
+        <div class="quiz-header">
+            <h2>Python Quiz</h2>
+            <div id="question-container"></div>
+            <ul id="answers">
+            </ul>
+            <button id="submit">Submit</button>
         </div>
     </div>
     <script src="script.js"></script>
