@@ -1,9 +1,10 @@
-// Функция для генерации случайной картинки
+let score = 0;
+let leaderboardData = [];
+
 function generateRandomImage() {
     const images = [
         'image1.jpg',
-        'image2.jpg',
-        'image3.jpg',
+        
         // Добавьте здесь другие изображения
     ];
 
@@ -13,33 +14,58 @@ function generateRandomImage() {
     document.getElementById('clickerImage').src = randomImage;
 }
 
-// Вызов функции для генерации случайной картинки при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    generateRandomImage();
-});
-
-// Обновление таблицы лидеров
 function updateLeaderboard() {
     // Код обновления таблицы лидеров
 }
 
-// Функция для обновления счета
 function updateScore(score) {
     document.getElementById('score').textContent = `Очки: ${score}`;
 }
 
-// Добавление очков при клике
 document.getElementById('clickerContainer').addEventListener('click', () => {
-    // Увеличиваем счет
     score++;
     updateScore(score);
 });
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
-    // Получаем данные таблицы лидеров из сервера (предполагается AJAX-запрос)
-    // Здесь можно использовать fetch или другие методы для получения данных
+document.getElementById('registerButton').addEventListener('click', () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
 
-    // После получения данных обновляем таблицу лидеров
+    // Создаем объект для отправки на сервер
+    const data = {
+        username: username,
+        password: password
+    };
+
+    // Отправляем POST запрос на сервер
+    fetch('https://ehtid.github.io/2-ST/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Обработка успешного ответа от сервера
+        console.log('Регистрация прошла успешно', data);
+        // После успешной регистрации, можно обновить таблицу лидеров и сбросить счет
+        updateLeaderboard();
+        score = 0;
+        updateScore(score);
+    })
+    .catch(error => {
+        // Обработка ошибки
+        console.error('There has been a problem with your fetch operation:', error);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    generateRandomImage();
     updateLeaderboard();
 });
