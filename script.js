@@ -1,110 +1,45 @@
+// Функция для генерации случайной картинки
+function generateRandomImage() {
+    const images = [
+        'image1.jpg',
+        'image2.jpg',
+        'image3.jpg',
+        // Добавьте здесь другие изображения
+    ];
+
+    const randomIndex = Math.floor(Math.random() * images.length);
+    const randomImage = images[randomIndex];
+
+    document.getElementById('clickerImage').src = randomImage;
+}
+
+// Вызов функции для генерации случайной картинки при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    const firebaseConfig = {
-        apiKey: "AIzaSyAcApNqe43fz4XAlmzBYnY0Nc_OOUgoBm0",
-        authDomain: "ehtid-b19af.firebaseapp.com",
-        projectId: "ehtid-b19af",
-        storageBucket: "ehtid-b19af.appspot.com",
-        messagingSenderId: "803299970129",
-        appId: "1:803299970129:web:b7f9bd1600d1598215bc70"
-    };
-    
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const storage = firebase.storage();
-    
-    const fileInput = document.getElementById('fileInput');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const fileList = document.getElementById('fileList');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const progressPercentage = document.getElementById('progressPercentage');
-    const storageInfo = document.getElementById('storageInfo');
-    let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+    generateRandomImage();
+});
 
-    function updateStorageInfo() {
-        const usedSpace = uploadedFiles.reduce((total, file) => total + file.size, 0);
-        const freeSpace = 1024 * 1024 * 1024 - usedSpace; // Example: 1GB quota
-        storageInfo.textContent = `Used: ${(usedSpace / 1024 / 1024).toFixed(2)} MB, Free: ${(freeSpace / 1024 / 1024).toFixed(2)} MB`;
-    }
+// Обновление таблицы лидеров
+function updateLeaderboard() {
+    // Код обновления таблицы лидеров
+}
 
-    function saveToLocalStorage() {
-        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-        updateStorageInfo();
-    }
+// Функция для обновления счета
+function updateScore(score) {
+    document.getElementById('score').textContent = `Очки: ${score}`;
+}
 
-    uploadBtn.addEventListener('click', () => {
-        const files = fileInput.files;
-        if (files.length === 0) {
-            alert('Please select a file.');
-            return;
-        }
+// Добавление очков при клике
+document.getElementById('clickerContainer').addEventListener('click', () => {
+    // Увеличиваем счет
+    score++;
+    updateScore(score);
+});
 
-        Array.from(files).forEach(file => {
-            const storageRef = storage.ref(file.name);
-            const uploadTask = storageRef.put(file);
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    // Получаем данные таблицы лидеров из сервера (предполагается AJAX-запрос)
+    // Здесь можно использовать fetch или другие методы для получения данных
 
-            uploadTask.on('state_changed', 
-                snapshot => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    uploadProgress.value = progress;
-                    progressPercentage.textContent = `${progress.toFixed(2)}%`;
-                }, 
-                error => {
-                    console.error('Upload failed:', error);
-                }, 
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                        uploadedFiles.push({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                            url: downloadURL
-                        });
-                        saveToLocalStorage();
-                        addFileToList(file.name, downloadURL, file.size);
-                        uploadProgress.value = 0;
-                        progressPercentage.textContent = '0%';
-                    });
-                }
-            );
-        });
-    });
-
-    function addFileToList(name, url, size) {
-        const li = document.createElement('li');
-        li.textContent = name;
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('deleteBtn');
-        deleteBtn.addEventListener('click', () => {
-            const fileRef = storage.ref(name);
-            fileRef.delete().then(() => {
-                li.remove();
-                uploadedFiles = uploadedFiles.filter(file => file.name !== name);
-                saveToLocalStorage();
-            }).catch(error => {
-                console.error('Error deleting file:', error);
-            });
-        });
-
-        const downloadBtn = document.createElement('button');
-        downloadBtn.textContent = 'Download';
-        downloadBtn.classList.add('downloadBtn');
-        downloadBtn.addEventListener('click', () => {
-            window.location.href = url;
-        });
-
-        li.appendChild(deleteBtn);
-        li.appendChild(downloadBtn);
-        fileList.appendChild(li);
-    }
-
-    function loadFiles() {
-        uploadedFiles.forEach(file => {
-            addFileToList(file.name, file.url, file.size);
-        });
-        updateStorageInfo();
-    }
-
-    loadFiles();
+    // После получения данных обновляем таблицу лидеров
+    updateLeaderboard();
 });
