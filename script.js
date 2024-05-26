@@ -1,110 +1,136 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const firebaseConfig = {
-        apiKey: "AIzaSyAcApNqe43fz4XAlmzBYnY0Nc_OOUgoBm0",
-        authDomain: "ehtid-b19af.firebaseapp.com",
-        projectId: "ehtid-b19af",
-        storageBucket: "ehtid-b19af.appspot.com",
-        messagingSenderId: "803299970129",
-        appId: "1:803299970129:web:b7f9bd1600d1598215bc70"
-    };
+const quizData = [
+    {
+        question: "Basic Syntax: What will be the output of the following code?\nprint(\"Hello, World!\")",
+        a: "Hello World",
+        b: "Hello, World!",
+        c: "\"Hello, World!\"",
+        d: "print(\"Hello, World!\")",
+        correct: "b",
+    },
+    {
+        question: "Variables and Data Types: How do you declare a variable and assign the integer value 10 to it in Python?",
+        a: "int x = 10",
+        b: "x := 10",
+        c: "x = 10",
+        d: "declare x = 10",
+        correct: "c",
+    },
+    {
+        question: "Control Flow: What is the output of the following code?\nx = 5\nif x > 2:\n    print(\"Greater than 2\")\nelse:\n    print(\"Less than or equal to 2\")",
+        a: "Greater than 2",
+        b: "Less than or equal to 2",
+        c: "Error",
+        d: "Nothing",
+        correct: "a",
+    },
+    {
+        question: "Loops: How would you write a for loop that prints all numbers from 0 to 9?",
+        a: "for x in range(0, 9): print(x)",
+        b: "for x in range(10): print(x)",
+        c: "for x in 0..9: print(x)",
+        d: "for x in 1..10: print(x)",
+        correct: "b",
+    },
+    {
+        question: "Functions: How do you define a function in Python that takes two arguments and returns their sum?",
+        a: "def add(a, b) return a + b",
+        b: "def add(a, b): return a + b",
+        c: "function add(a, b): return a + b",
+        d: "def add(int a, int b): return a + b",
+        correct: "b",
+    },
+    {
+        question: "Lists: How do you append an element to a list in Python?",
+        a: "list.append(element)",
+        b: "list.add(element)",
+        c: "list.push(element)",
+        d: "list.insert(element)",
+        correct: "a",
+    },
+    {
+        question: "Dictionaries: How do you access the value associated with the key 'name' in the following dictionary?\nperson = {'name': 'Alice', 'age': 30}",
+        a: "person.name",
+        b: "person['name']",
+        c: "person->name",
+        d: "person.get('name')",
+        correct: "b",
+    },
+    {
+        question: "String Manipulation: How can you concatenate the strings 'Hello' and 'World' with a space in between?",
+        a: "'Hello' + ' ' + 'World'",
+        b: "'Hello' & ' ' & 'World'",
+        c: "'Hello'.append(' ').append('World')",
+        d: "concat('Hello', ' ', 'World')",
+        correct: "a",
+    },
+    // Add more questions here...
+];
+
+const quiz = document.getElementById('quiz');
+const questionContainer = document.getElementById('question-container');
+const answerEls = document.querySelectorAll('#answers li');
+const submitBtn = document.getElementById('submit');
+
+let currentQuiz = 0;
+let score = 0;
+
+loadQuiz();
+
+function loadQuiz() {
+    const currentQuizData = quizData[currentQuiz];
     
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const storage = firebase.storage();
-    
-    const fileInput = document.getElementById('fileInput');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const fileList = document.getElementById('fileList');
-    const uploadProgress = document.getElementById('uploadProgress');
-    const progressPercentage = document.getElementById('progressPercentage');
-    const storageInfo = document.getElementById('storageInfo');
-    let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+    questionContainer.innerHTML = `<h3>${currentQuizData.question}</h3>`;
+    document.getElementById('answers').innerHTML = `
+        <li>
+            <input type="radio" name="answer" id="a" value="a">
+            <label for="a">${currentQuizData.a}</label>
+        </li>
+        <li>
+            <input type="radio" name="answer" id="b" value="b">
+            <label for="b">${currentQuizData.b}</label>
+        </li>
+        <li>
+            <input type="radio" name="answer" id="c" value="c">
+            <label for="c">${currentQuizData.c}</label>
+        </li>
+        <li>
+            <input type="radio" name="answer" id="d" value="d">
+            <label for="d">${currentQuizData.d}</label>
+        </li>
+    `;
+}
 
-    function updateStorageInfo() {
-        const usedSpace = uploadedFiles.reduce((total, file) => total + file.size, 0);
-        const freeSpace = 1024 * 1024 * 1024 - usedSpace; // Example: 1GB quota
-        storageInfo.textContent = `Used: ${(usedSpace / 1024 / 1024).toFixed(2)} MB, Free: ${(freeSpace / 1024 / 1024).toFixed(2)} MB`;
-    }
+function getSelected() {
+    const answerEls = document.querySelectorAll('input[name="answer"]');
+    let answer = undefined;
 
-    function saveToLocalStorage() {
-        localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
-        updateStorageInfo();
-    }
-
-    uploadBtn.addEventListener('click', () => {
-        const files = fileInput.files;
-        if (files.length === 0) {
-            alert('Please select a file.');
-            return;
+    answerEls.forEach((answerEl) => {
+        if (answerEl.checked) {
+            answer = answerEl.value;
         }
-
-        Array.from(files).forEach(file => {
-            const storageRef = storage.ref(file.name);
-            const uploadTask = storageRef.put(file);
-
-            uploadTask.on('state_changed', 
-                snapshot => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    uploadProgress.value = progress;
-                    progressPercentage.textContent = `${progress.toFixed(2)}%`;
-                }, 
-                error => {
-                    console.error('Upload failed:', error);
-                }, 
-                () => {
-                    uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
-                        uploadedFiles.push({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                            url: downloadURL
-                        });
-                        saveToLocalStorage();
-                        addFileToList(file.name, downloadURL, file.size);
-                        uploadProgress.value = 0;
-                        progressPercentage.textContent = '0%';
-                    });
-                }
-            );
-        });
     });
 
-    function addFileToList(name, url, size) {
-        const li = document.createElement('li');
-        li.textContent = name;
+    return answer;
+}
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.classList.add('deleteBtn');
-        deleteBtn.addEventListener('click', () => {
-            const fileRef = storage.ref(name);
-            fileRef.delete().then(() => {
-                li.remove();
-                uploadedFiles = uploadedFiles.filter(file => file.name !== name);
-                saveToLocalStorage();
-            }).catch(error => {
-                console.error('Error deleting file:', error);
-            });
-        });
+submitBtn.addEventListener('click', () => {
+    const answer = getSelected();
 
-        const downloadBtn = document.createElement('button');
-        downloadBtn.textContent = 'Download';
-        downloadBtn.classList.add('downloadBtn');
-        downloadBtn.addEventListener('click', () => {
-            window.location.href = url;
-        });
+    if (answer) {
+        if (answer === quizData[currentQuiz].correct) {
+            score++;
+        }
 
-        li.appendChild(deleteBtn);
-        li.appendChild(downloadBtn);
-        fileList.appendChild(li);
+        currentQuiz++;
+
+        if (currentQuiz < quizData.length) {
+            loadQuiz();
+        } else {
+            quiz.innerHTML = `
+                <h2>You answered ${score}/${quizData.length} questions correctly</h2>
+                <h3>Your knowledge level: ${(score / quizData.length) * 100}%</h3>
+                <button onclick="location.reload()">Reload</button>
+            `;
+        }
     }
-
-    function loadFiles() {
-        uploadedFiles.forEach(file => {
-            addFileToList(file.name, file.url, file.size);
-        });
-        updateStorageInfo();
-    }
-
-    loadFiles();
 });
