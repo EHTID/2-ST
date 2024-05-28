@@ -3,28 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кликер с таблицей лидеров</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Space Adventure Game</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
+        canvas {
+            border: 1px solid #fff;
+        }
+    </style>
 </head>
 <body>
-    <h1>Кликер</h1>
-    <div id="clickerContainer">
-        <img src="" alt="Random Image" id="clickerImage">
-    </div>
-    <div id="score">Очки: 0</div>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-    <h2>Таблица лидеров</h2>
-    <table id="leaderboard">
-        <!-- Тут будут данные таблицы -->
-    </table>
+        let ship = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 70,
+            width: 50,
+            height: 60,
+            dx: 0
+        };
 
-    <div id="registrationForm">
-        <h2>Регистрация</h2>
-        <input type="text" id="username" placeholder="Имя пользователя">
-        <input type="password" id="password" placeholder="Пароль">
-        <button id="registerButton">Зарегистрироваться</button>
-    </div>
+        let meteors = [];
+        let score = 0;
+        let gameOver = false;
 
-    <script src="script.js"></script>
+        function drawShip() {
+            ctx.fillStyle = '#00f';
+            ctx.beginPath();
+            ctx.moveTo(ship.x, ship.y);
+            ctx.lineTo(ship.x + ship.width / 2, ship.y - ship.height);
+            ctx.lineTo(ship.x + ship.width, ship.y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function drawMeteors() {
+            ctx.fillStyle = '#f00';
+            meteors.forEach(meteor => {
+                ctx.beginPath();
+                ctx.arc(meteor.x, meteor.y, meteor.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function drawScore() {
+            ctx.fillStyle = '#fff';
+            ctx.font = '20px Arial';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
+
+        function updateShip() {
+            ship.x += ship.dx;
+
+            if (ship.x < 0) ship.x = 0;
+            if (ship.x + ship.width > canvas.width) ship.x = canvas.width - ship.width;
+        }
+
+        function updateMeteors() {
+            for (let i = 0; i < meteors.length; i++) {
+                meteors[i].y += meteors[i].dy;
+
+                if (meteors[i].y > canvas.height) {
+                    meteors.splice(i, 1);
+                    score++;
+                }
+
+                if (
+                    ship.x < meteors[i].x + meteors[i].radius &&
+                    ship.x + ship.width > meteors[i].x - meteors[i].radius &&
+                    ship.y < meteors[i].y + meteors[i].radius &&
+                    ship.y + ship.height > meteors[i].y - meteors[i].radius
+                ) {
+                    gameOver = true;
+                }
+            }
+
+            if (Math.random() < 0.02) {
+                meteors.push({
+                    x: Math.random() * canvas.width,
+                    y: -20,
+                    radius: 20,
+                    dy: 4
+                });
+            }
+        }
+
+        function clear() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function update() {
+            if (gameOver) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '50px Arial';
+                ctx.fillText('Game Over', canvas.width / 2 - 150, canvas.height / 2);
+                return;
+            }
+
+            clear();
+            drawShip();
+            drawMeteors();
+            drawScore();
+            updateShip();
+            updateMeteors();
+            requestAnimationFrame(update);
+        }
+
+        function handleTouchStart(e) {
+            const touchX = e.touches[0].clientX;
+            if (touchX < ship.x) {
+                ship.dx = -5;
+            } else {
+                ship.dx = 5;
+            }
+        }
+
+        function handleTouchEnd() {
+            ship.dx = 0;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                ship.dx = -5;
+            } else if (e.key === 'ArrowRight') {
+                ship.dx = 5;
+            }
+        });
+
+        document.addEventListener('keyup', () => {
+            ship.dx = 0;
+        });
+
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchend', handleTouchEnd);
+
+        update();
+    </script>
 </body>
 </html>
